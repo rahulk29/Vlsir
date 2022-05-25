@@ -1,5 +1,5 @@
 """
-# Spectre-Format Netlister
+# Ngspice-Format Netlister
 """
 
 # Std-Lib Imports
@@ -12,18 +12,18 @@ import vlsir
 from .base import Netlister, ResolvedModule, ResolvedParams, SpicePrefix
 
 
-class SpectreNetlister(Netlister):
-    """Spectre-Format Netlister"""
+class NgspiceNetlister(Netlister):
+    """Ngspice-Format Netlister"""
 
     @property
     def enum(self):
         """Get our entry in the `NetlistFormat` enumeration"""
         from . import NetlistFormat
 
-        return NetlistFormat.SPECTRE
+        return NetlistFormat.NGSPICE
 
     def write_module_definition(self, module: vlsir.circuit.Module) -> None:
-        """Create a Spectre-format definition for proto-Module `module`"""
+        """Create a Ngspice-format definition for proto-Module `module`"""
 
         # Create the module name
         module_name = self.get_module_name(module)
@@ -35,7 +35,7 @@ class SpectreNetlister(Netlister):
         self.pmodules[module.name] = module
 
         # Create the sub-circuit definition header
-        self.write(f"subckt {module_name} \n")
+        self.write(f".subckt {module_name} \n")
 
         if module.ports:  # Create its ports
             self.write("+  ")
@@ -43,11 +43,11 @@ class SpectreNetlister(Netlister):
                 self.write(self.format_port_decl(pport) + " ")
             self.write("\n")
         else:
-            self.write("+  // No ports \n")
+            self.write("+  * No ports \n")
 
         # Create its parameters, if defined
         if module.parameters:
-            self.write("parameters ")
+            self.write(".param ")
             for name, pparam in module.parameters.items():
                 self.write(
                     self.format_param_decl(name, pparam)

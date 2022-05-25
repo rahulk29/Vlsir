@@ -16,7 +16,7 @@ import vlsir
 
 
 class ResultFormat(Enum):
-    """ Enumerated Result Formats """
+    """Enumerated Result Formats"""
 
     SIM_DATA = auto()  # The `SimData` classes defined below
     VLSIR_PROTO = auto()  # `vlsir.spice.SimResults` and related protobuf-defined types
@@ -96,4 +96,3 @@ class SimResult:
         for a in self.an:
             res.an.append(vlsir.spice.AnalysisResult(**{a.vlsir_type: a.to_proto()}))
         return res
-

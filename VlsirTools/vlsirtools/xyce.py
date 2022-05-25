@@ -18,16 +18,16 @@ XYCE_EXECUTABLE = "Xyce"  # The simulator executable invoked. If over-ridden, li
 
 
 def available() -> bool:
-    """ Boolean indication of whether the current running environment includes the simulator executable on its path. """
+    """Boolean indication of whether the current running environment includes the simulator executable on its path."""
     return shutil.which(XYCE_EXECUTABLE) is not None
 
 
 def sim(
     inp: vlsir.spice.SimInput, fmt: ResultFormat = ResultFormat.VLSIR_PROTO
 ) -> vlsir.spice.SimResult:
-    """ 
-    # Primary Simulation Method 
-    Implements the `vlsir.spice.Sim` RPC interface. 
+    """
+    # Primary Simulation Method
+    Implements the `vlsir.spice.Sim` RPC interface.
     """
 
     if fmt != ResultFormat.VLSIR_PROTO:
@@ -38,20 +38,20 @@ def sim(
 
 
 class XyceSim(Sim):
-    """ 
-    State and execution logic for a Xyce-call to `vlsir.spice.Sim`. 
-    
-    Xyce can, in principle, run multiple analyses per process, 
-    but seems to commonly confuse outputs or disallow saving them
-    from multiple analyses. 
+    """
+    State and execution logic for a Xyce-call to `vlsir.spice.Sim`.
 
-    Execution therefore instead occurs one Xyce-process per analysis. 
-    Results from each analysis-process are collated into a single `SimResult`. 
+    Xyce can, in principle, run multiple analyses per process,
+    but seems to commonly confuse outputs or disallow saving them
+    from multiple analyses.
+
+    Execution therefore instead occurs one Xyce-process per analysis.
+    Results from each analysis-process are collated into a single `SimResult`.
     """
 
     def _run(self) -> vlsir.spice.SimResult:
-        """ Run the specified `SimInput` in directory `self.tmpdir`, 
-        returning its results. """
+        """Run the specified `SimInput` in directory `self.tmpdir`,
+        returning its results."""
 
         netlist_file = open("dut", "w")
         netlist(pkg=self.inp.pkg, dest=netlist_file, fmt="xyce")
@@ -79,7 +79,7 @@ class XyceSim(Sim):
         return results
 
     def analysis(self, an: vlsir.spice.Analysis) -> vlsir.spice.AnalysisResult:
-        """ Execute a `vlsir.spice.Analysis`, returning its `vlsir.spice.AnalysisResult`. """
+        """Execute a `vlsir.spice.Analysis`, returning its `vlsir.spice.AnalysisResult`."""
 
         # `Analysis` is a Union (protobuf `oneof`) of the analysis-types.
         # Unwrap it, and dispatch based on the type.
@@ -99,7 +99,7 @@ class XyceSim(Sim):
         raise RuntimeError(f"Unknown analysis type: {inner}")
 
     def ac(self, an: vlsir.spice.AcInput) -> vlsir.spice.AcResult:
-        """ Run an AC analysis. """
+        """Run an AC analysis."""
 
         # Unpack the `AcInput`
         analysis_name = an.analysis_name or "ac"
@@ -150,7 +150,7 @@ class XyceSim(Sim):
         return vlsir.spice.AcResult(freq=freq, signals=signals, data=cplx_data)
 
     def dc(self, an: vlsir.spice.DcInput) -> vlsir.spice.DcResult:
-        """ Run a DC analysis. """
+        """Run a DC analysis."""
 
         # Unpack the `DcInput`
         analysis_name = an.analysis_name or "dc"
@@ -203,9 +203,9 @@ class XyceSim(Sim):
         return vlsir.spice.DcResult(signals=signals, data=data)
 
     def op(self, an: vlsir.spice.OpInput) -> vlsir.spice.OpResult:
-        """ Run an operating-point analysis. 
-        Xyce describes the `.op` analysis as "partially supported". 
-        Here the `vlsir.spice.Op` analysis is mapped to DC, with a dummy sweep. """
+        """Run an operating-point analysis.
+        Xyce describes the `.op` analysis as "partially supported".
+        Here the `vlsir.spice.Op` analysis is mapped to DC, with a dummy sweep."""
 
         # Unpack the `OpInput`
         analysis_name = an.analysis_name or "op"
@@ -242,7 +242,7 @@ class XyceSim(Sim):
         return vlsir.spice.OpResult(signals=signals, data=data)
 
     def tran(self, an: vlsir.spice.TranInput) -> vlsir.spice.TranResult:
-        """ Run a transient analysis. """
+        """Run a transient analysis."""
 
         # Extract fields from our `TranInput`
         analysis_name = an.analysis_name or "tran"
@@ -289,7 +289,7 @@ class XyceSim(Sim):
         return vlsir.spice.TranResult(signals=signals, data=data)
 
     def run_xyce_process(self, name: str):
-        """ Run a `Xyce` sub-process, collecting terminal output. """
+        """Run a `Xyce` sub-process, collecting terminal output."""
 
         try:
             subprocess.run(
@@ -305,7 +305,7 @@ class XyceSim(Sim):
             raise
 
     def read_csv(self, handle: IO) -> Tuple[List[str], List[float]]:
-        """ Read a text-header + float CSV from file-handle `handle`. """
+        """Read a text-header + float CSV from file-handle `handle`."""
 
         # Get the header-list of strings
         header_line = handle.readline().strip()
@@ -319,4 +319,3 @@ class XyceSim(Sim):
 
         # And return the two as a tuple
         return (headers, data)
-

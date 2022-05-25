@@ -117,7 +117,9 @@ def test_netlist1():
             ),
             Module(
                 name="top",
-                ports=[Port(direction="NONE", signal=Signal(name="VSS", width=1)),],
+                ports=[
+                    Port(direction="NONE", signal=Signal(name="VSS", width=1)),
+                ],
                 signals=[Signal(name="vvv", width=1)],
                 instances=[
                     Instance(
@@ -176,9 +178,9 @@ def test_netlist_hdl21_ideal1():
 
 
 def empty_testbench_package():
-    """ Create and return a `circuit.Package` with a single, (near) empty testbench module. 
-    Some simulators *really* don't like empty DUT content, and others don't like singly-connected nodes. 
-    So the simplest test-bench is two resistors, in parallel, between ground and a single "other node". """
+    """Create and return a `circuit.Package` with a single, (near) empty testbench module.
+    Some simulators *really* don't like empty DUT content, and others don't like singly-connected nodes.
+    So the simplest test-bench is two resistors, in parallel, between ground and a single "other node"."""
 
     from vlsir.circuit_pb2 import (
         Module,
@@ -210,34 +212,52 @@ def empty_testbench_package():
         modules=[
             Module(
                 name="empty_testbench",
-                ports=[Port(direction="NONE", signal=Signal(name="VSS", width=1)),],
-                signals=[Signal(name="the_other_node", width=1),],
-                instances=[_r("r1"), _r("r2"),],
+                ports=[
+                    Port(direction="NONE", signal=Signal(name="VSS", width=1)),
+                ],
+                signals=[
+                    Signal(name="the_other_node", width=1),
+                ],
+                instances=[
+                    _r("r1"),
+                    _r("r2"),
+                ],
             )
         ],
     )
 
 
 @pytest.mark.skipif(
-    not vlsirtools.spectre.available(), reason="No spectre installation on path",
+    not vlsirtools.spectre.available(),
+    reason="No spectre installation on path",
 )
 def test_spectre1():
-    """ Test an empty-input call to the `vlsir.spice.Sim` interface to `spectre`. """
+    """Test an empty-input call to the `vlsir.spice.Sim` interface to `spectre`."""
     from vlsir.spice_pb2 import SimInput
     from vlsirtools.spectre import sim, SimResult
 
-    results = sim(SimInput(top="empty_testbench", pkg=empty_testbench_package(),))
+    results = sim(
+        SimInput(
+            top="empty_testbench",
+            pkg=empty_testbench_package(),
+        )
+    )
     assert isinstance(results, SimResult)
 
 
 @pytest.mark.skipif(
-    not vlsirtools.xyce.available(), reason="No Xyce installation on path",
+    not vlsirtools.xyce.available(),
+    reason="No Xyce installation on path",
 )
 def test_xyce1():
-    """ Test an empty-input call to the `vlsir.spice.Sim` interface to `xyce`. """
+    """Test an empty-input call to the `vlsir.spice.Sim` interface to `xyce`."""
     from vlsir.spice_pb2 import SimInput, SimResult
     from vlsirtools.xyce import sim
 
-    results = sim(SimInput(top="empty_testbench", pkg=empty_testbench_package(),))
+    results = sim(
+        SimInput(
+            top="empty_testbench",
+            pkg=empty_testbench_package(),
+        )
+    )
     assert isinstance(results, SimResult)
-

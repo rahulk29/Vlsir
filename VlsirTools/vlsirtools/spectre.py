@@ -19,7 +19,7 @@ SPECTRE_EXECUTABLE = "spectre"  # The simulator executable invoked. If over-ridd
 
 
 def available() -> bool:
-    """ Boolean indication of whether the current running environment includes the simulator executable on its path. """
+    """Boolean indication of whether the current running environment includes the simulator executable on its path."""
     return shutil.which(SPECTRE_EXECUTABLE) is not None
 
 
@@ -59,7 +59,7 @@ class SpectreSim(Sim):
     """
 
     def _run(self) -> SimResult:
-        """ Run the specified `SimInput` in directory `self.tmpdir`, returning its results. """
+        """Run the specified `SimInput` in directory `self.tmpdir`, returning its results."""
 
         netlist_file = open("netlist.scs", "w")
         netlist_file.write("// Test Netlist \n\n")
@@ -96,7 +96,7 @@ class SpectreSim(Sim):
         return SimResult(an=results)
 
     def write_control_elements(self, netlist_file) -> None:
-        """ Write control elements to the netlist """
+        """Write control elements to the netlist"""
         for ctrl in self.inp.ctrls:
             inner = ctrl.WhichOneof("ctrl")
             if inner == "include":
@@ -118,11 +118,11 @@ class SpectreSim(Sim):
         inner_dispatch[inner](getattr(an, inner), netlist_file)
 
     def netlist_ac(self, an: vlsir.spice.AcInput, netlist_file) -> None:
-        """ Run an AC analysis. """
+        """Run an AC analysis."""
         raise NotImplementedError
 
     def netlist_dc(self, an: vlsir.spice.DcInput, netlist_file) -> None:
-        """ Run a DC analysis. """
+        """Run a DC analysis."""
         raise NotImplementedError
 
     def netlist_op(self, an: vlsir.spice.OpInput, netlist_file) -> None:
@@ -167,7 +167,7 @@ class SpectreSim(Sim):
         return TranResult(analysis_name=an.analysis_name, data=data["data"])
 
     def run_simulation(self):
-        """ Run a Spectre simulation """
+        """Run a Spectre simulation"""
 
         cmd = f"{SPECTRE_EXECUTABLE} -E -format nutbin netlist.scs"
         try:
@@ -211,7 +211,8 @@ def parse(filename: str) -> Mapping[str, Any]:
             )
             num_pts = int(
                 re.match(
-                    r"No. Points:\s+(?P<num_pts>\d+)\n", num_pts_line.decode("ascii"),
+                    r"No. Points:\s+(?P<num_pts>\d+)\n",
+                    num_pts_line.decode("ascii"),
                 ).group("num_pts")
             )
 

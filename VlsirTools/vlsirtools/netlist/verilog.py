@@ -10,18 +10,18 @@ from .base import Netlister, SpicePrefix
 
 class VerilogNetlister(Netlister):
     """
-    # Structural Verilog Netlister 
+    # Structural Verilog Netlister
     """
 
     @property
     def enum(self):
-        """ Get our entry in the `NetlistFormat` enumeration """
+        """Get our entry in the `NetlistFormat` enumeration"""
         from . import NetlistFormat
 
         return NetlistFormat.VERILOG
 
     def write_module_definition(self, module: vlsir.circuit.Module) -> None:
-        """ Create a Verilog module definition for proto-Module `module` """
+        """Create a Verilog module definition for proto-Module `module`"""
 
         # Create the module name
         module_name = self.get_module_name(module)
@@ -84,7 +84,7 @@ class VerilogNetlister(Netlister):
         self.writeln(f"endmodule // {module_name} \n\n")
 
     def write_instance(self, pinst: vlsir.circuit.Instance) -> None:
-        """ Format and write Instance `pinst` """
+        """Format and write Instance `pinst`"""
 
         # Get its Module or ExternalModule definition
         rmodule = self.resolve_reference(pinst.module)
@@ -134,7 +134,7 @@ class VerilogNetlister(Netlister):
 
     @classmethod
     def format_param_type(cls, pparam: vlsir.circuit.Parameter) -> str:
-        """ Verilog type-string for `Parameter` `param`. """
+        """Verilog type-string for `Parameter` `param`."""
         ptype = pparam.WhichOneof("value")
         if ptype == "integer":
             return "longint"
@@ -146,7 +146,7 @@ class VerilogNetlister(Netlister):
 
     @classmethod
     def format_param_decl(cls, name: str, param: vlsir.circuit.Parameter) -> str:
-        """ Format a parameter-declaration """
+        """Format a parameter-declaration"""
         rv = f"parameter {name}"
         # FIXME: whether to include datatype
         # dtype = cls.format_param_type(param)
@@ -156,14 +156,14 @@ class VerilogNetlister(Netlister):
         return rv
 
     def format_concat(self, pconc: vlsir.circuit.Concat) -> str:
-        """ Format the Concatenation of several other Connections """
+        """Format the Concatenation of several other Connections"""
         # Verilog { a, b, c } concatenation format
         parts = [self.format_connection(part) for part in pconc.parts]
         return "{" + ", ".join(parts) + "}"
 
     @classmethod
     def format_port_decl(cls, pport: vlsir.circuit.Port) -> str:
-        """ Format a `Port` declaration """
+        """Format a `Port` declaration"""
 
         # First retrieve and check the validity of its direction
         port_type_to_str = {
@@ -184,7 +184,7 @@ class VerilogNetlister(Netlister):
 
     @classmethod
     def format_signal_decl(cls, psig: vlsir.circuit.Signal) -> str:
-        """ Format a `Signal` declaration """
+        """Format a `Signal` declaration"""
         rv = "wire"
         if psig.width > 1:
             rv += f" [{psig.width-1}:0]"
@@ -193,23 +193,23 @@ class VerilogNetlister(Netlister):
 
     @classmethod
     def format_port_ref(cls, pport: vlsir.circuit.Port) -> str:
-        """ Format a reference to a `Port`. 
-        Unlike declarations, this just requires the name of its `Signal`. """
+        """Format a reference to a `Port`.
+        Unlike declarations, this just requires the name of its `Signal`."""
         return cls.format_signal_ref(pport.signal)
 
     @classmethod
     def format_signal_ref(cls, psig: vlsir.circuit.Signal) -> str:
-        """ Format a reference to a `Signal`. 
-        Unlike declarations, this just requires its name. """
+        """Format a reference to a `Signal`.
+        Unlike declarations, this just requires its name."""
         return psig.name
 
     @classmethod
     def format_signal_slice(cls, pslice: vlsir.circuit.Slice) -> str:
-        """ Format Signal-Slice `pslice` """
+        """Format Signal-Slice `pslice`"""
         if pslice.top == pslice.bot:  # Single-bit slice
             return f"{pslice.signal}[{pslice.top}]"
         return f"{pslice.signal}[{pslice.top}:{pslice.bot}]"  # Multi-bit slice
 
     def write_comment(self, comment: str) -> None:
-        """ Verilog uses C-style line comments, beginning with `//` """
+        """Verilog uses C-style line comments, beginning with `//`"""
         self.write(f"// {comment}\n")
