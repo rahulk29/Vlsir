@@ -207,9 +207,7 @@ class NgspiceNetlister(Netlister):
     def format_bus_bit(cls, index: Union[int, str]) -> str:
         """Format-specific string-representation of a bus bit-index"""
         # Spectre netlisting uses an underscore prefix, e.g. `bus_0`
-        return "_" + str(index)
+        return "[" + str(index) + "]"
 
     def write_comment(self, comment: str) -> None:
-        """While Spectre *can* do a bunch of other comment-styles,
-        the canonical one is generally the C-style line comment beginning with `//`."""
-        self.write(f"// {comment}\n")
+        self.write(f"* {comment}\n")

@@ -335,7 +335,7 @@ class SpiceNetlister(Netlister):
     def format_bus_bit(cls, index: Union[int, str]) -> str:
         """Format-specific string-representation of a bus bit-index"""
         # Spectre netlisting uses an underscore prefix, e.g. `bus_0`
-        return "_" + str(index)
+        return "[" + str(index) + "]"
 
     @classmethod
     def format_param_decl(cls, name: str, param: vlsir.circuit.Parameter) -> str:
